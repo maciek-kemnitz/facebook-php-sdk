@@ -488,14 +488,14 @@ abstract class BaseFacebook
       $params['scope'] = implode(',', $scopeParams);
     }
 
-    return $this->getUrl(
-      'www',
-      'dialog/oauth',
-      array_merge(array(
-                    'client_id' => $this->getAppId(),
-                    'redirect_uri' => $currentUrl, // possibly overwritten
-                    'state' => $this->state),
-                  $params));
+    $params = array_merge(array(
+      'client_id' => $this->getAppId(),
+      'redirect_uri' => $currentUrl, // possibly overwritten
+      'state' => $this->state
+    ), $params);
+    $this->setPersistentData('redirect_uri', $params['redirect_uri']);
+    $url = $this->getUrl('www', 'dialog/oauth', $params);
+    return $url;
   }
 
   /**
@@ -669,7 +669,7 @@ abstract class BaseFacebook
     }
 
     if ($redirect_uri === null) {
-      $redirect_uri = $this->getCurrentUrl();
+      $redirect_uri = $this->getPersistentData('redirect_uri', $this->getCurrentUrl());
     }
 
     try {
